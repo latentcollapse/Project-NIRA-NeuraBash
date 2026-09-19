@@ -30,7 +30,7 @@ jobs:
       - name: Mark scripts executable
         run: |
           chmod +x scripts/*.sh
-          chmod +x tests/token-collision/*.sh tests/static/*.sh tests/mixed-pipeline/*.sh
+          chmod +x tests/token-collision/*.sh tests/static/*.sh tests/mixed-pipeline/*.sh tests/bash-diff/*.sh
           chmod +x julia/bin/*.jl
 
       - name: Build NeuraBash

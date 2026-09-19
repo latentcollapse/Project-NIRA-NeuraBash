@@ -6,6 +6,7 @@ TESTS_DIR="$ROOT_DIR/tests"
 pass=0; fail=0
 run_one(){ local label="$1"; shift; echo "RUN  $label"; if "$@"; then echo "PASS $label"; ((pass+=1)); else echo "FAIL $label" >&2; ((fail+=1)); fi; }
 run_one token-collision "$TESTS_DIR/token-collision/collision_corpus.sh"
+run_one bash-diff env UPSTREAM_BASH_BIN="${UPSTREAM_BASH_BIN:-$ROOT_DIR/build/upstream/bin/bash}" NEURABASH_BIN="$ROOT_DIR/build/bin/neurabash" "$TESTS_DIR/bash-diff/smoke.sh"
 run_one static-integrity "$TESTS_DIR/static/no_fake_completion.sh"
 if [[ -x "$ROOT_DIR/build/bin/neurabash" ]]; then
   run_one native-jul-mvp env NEURABASH_BIN="$ROOT_DIR/build/bin/neurabash" "$TESTS_DIR/mixed-pipeline/native_jul_mvp.sh"

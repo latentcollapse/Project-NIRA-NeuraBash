@@ -6,7 +6,7 @@ const J=NeuraBash.JULSyntax
  @test J.split_pipeline("math.eval \"1 |!> 2\" |!> core.type")==["math.eval \"1 |!> 2\"","core.type"]
  @test J.split_pipeline("tool.define x @{ a |!> b } |!> core.type")==["tool.define x @{ a |!> b }","core.type"]
  @test J.tokenize_stage("math.eval \"2 + 2\"")==["math.eval","2 + 2"]
- @test J.tokenize_stage("check.equal '$HOME *.jl'")==["check.equal","$HOME *.jl"]
+ @test J.tokenize_stage("check.equal '\$HOME *.jl'")==["check.equal","\$HOME *.jl"]
  @test J.tokenize_stage("matrix.rank # ignored")==["matrix.rank"]
  @test J.parse_scalar("true")===true
  @test J.parse_scalar("null")===nothing

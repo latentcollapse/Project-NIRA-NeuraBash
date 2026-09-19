@@ -9,22 +9,22 @@ Base.showerror(io::IO, e::JULParseError) = print(io, "ParseError: ", e.message)
 function split_pipeline(source::AbstractString)::Vector{String}
     s=String(source)
     isempty(strip(s)) && throw(JULParseError("empty JUL segment"))
-    out=String[]; io=IOBuffer(); quote='\0'; escaped=false; comment=false
+    out=String[]; io=IOBuffer(); quote_char='\0'; escaped=false; comment=false
     paren=bracket=brace=0; i=firstindex(s)
     while i <= lastindex(s)
         c=s[i]
         if comment
             write(io,c); c=='\n' && (comment=false); i=nextind(s,i); continue
         end
-        if quote!='\0'
+        if quote_char!='\0'
             write(io,c)
             if escaped; escaped=false
-            elseif c=='\\' && quote=='"'; escaped=true
-            elseif c==quote; quote='\0'
+            elseif c=='\\' && quote_char=='"'; escaped=true
+            elseif c==quote_char; quote_char='\0'
             end
             i=nextind(s,i); continue
         end
-        if c=='\'' || c=='"'; quote=c; write(io,c); i=nextind(s,i); continue
+        if c=='\'' || c=='"'; quote_char=c; write(io,c); i=nextind(s,i); continue
         elseif c=='#'; comment=true; write(io,c); i=nextind(s,i); continue
         elseif c=='('; paren+=1
         elseif c==')'; paren-=1; paren>=0 || throw(JULParseError("unmatched ')'"))
@@ -45,7 +45,7 @@ function split_pipeline(source::AbstractString)::Vector{String}
         end
         write(io,c); i=nextind(s,i)
     end
-    quote=='\0' || throw(JULParseError("unterminated JUL string"))
+    quote_char=='\0' || throw(JULParseError("unterminated JUL string"))
     paren==0 || throw(JULParseError("unclosed parentheses"))
     bracket==0 || throw(JULParseError("unclosed list"))
     brace==0 || throw(JULParseError("unclosed map/block"))
@@ -54,11 +54,11 @@ function split_pipeline(source::AbstractString)::Vector{String}
 end
 
 function tokenize_stage(stage::AbstractString)::Vector{String}
-    s=String(stage); toks=String[]; io=IOBuffer(); quote='\0'; escaped=false; i=firstindex(s)
+    s=String(stage); toks=String[]; io=IOBuffer(); quote_char='\0'; escaped=false; i=firstindex(s)
     flush_token!() = position(io)==0 ? nothing : push!(toks,String(take!(io)))
     while i<=lastindex(s)
         c=s[i]
-        if quote!='\0'
+        if quote_char!='\0'
             if escaped
                 if c=='n'; write(io,'\n')
                 elseif c=='r'; write(io,'\r')
@@ -67,18 +67,18 @@ function tokenize_stage(stage::AbstractString)::Vector{String}
                 else; throw(JULParseError("invalid escape \\$(c)"))
                 end
                 escaped=false
-            elseif c=='\\' && quote=='"'; escaped=true
-            elseif c==quote; quote='\0'
+            elseif c=='\\' && quote_char=='"'; escaped=true
+            elseif c==quote_char; quote_char='\0'
             else; write(io,c)
             end
-        elseif c=='\'' || c=='"'; quote=c
+        elseif c=='\'' || c=='"'; quote_char=c
         elseif isspace(c); flush_token!()
         elseif c=='#'; break
         else; write(io,c)
         end
         i=nextind(s,i)
     end
-    quote=='\0' || throw(JULParseError("unterminated JUL string"))
+    quote_char=='\0' || throw(JULParseError("unterminated JUL string"))
     escaped && throw(JULParseError("dangling escape"))
     flush_token!(); isempty(toks) && throw(JULParseError("empty JUL stage")); toks
 end

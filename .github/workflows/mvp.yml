@@ -41,6 +41,11 @@ jobs:
           UPSTREAM_BASH_BIN: ${{ github.workspace }}/build/upstream/bin/bash
         run: ./scripts/test.sh
 
+      - name: Install smoke test
+        run: |
+          ./scripts/install.sh --prefix "$RUNNER_TEMP/neurabash-install"
+          "$RUNNER_TEMP/neurabash-install/bin/neurabash" --noprofile --norc -c '|!> math.eval "6*7"'
+
       - name: Print runtime versions
         if: always()
         run: |

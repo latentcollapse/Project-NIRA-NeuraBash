@@ -138,10 +138,17 @@ function _primary(p)
 end
 function _power(p); a=_primary(p); accept!(p,:op,"^") ? _pow(a,_unary(p)) : a end
 function _unary(p); accept!(p,:op,"+")&&return +_unary(p); accept!(p,:op,"-")&&return -_unary(p); _power(p) end
+function _int_promote(z::BigInt)
+    typemin(Int64)<=z<=typemax(Int64) ? Int64(z) : z
+end
+_exact_add(a,b) = (a isa Integer && b isa Integer) ? _int_promote(big(a)+big(b)) : a+b
+_exact_sub(a,b) = (a isa Integer && b isa Integer) ? _int_promote(big(a)-big(b)) : a-b
+_exact_mul(a,b) = (a isa Integer && b isa Integer) ? _int_promote(big(a)*big(b)) : a*b
+
 function _product(p)
     v=_unary(p)
     while true
-        if accept!(p,:op,"*"); v=v*_unary(p)
+        if accept!(p,:op,"*"); v=_exact_mul(v,_unary(p))
         elseif accept!(p,:op,"/"); v=v/_unary(p)
         elseif accept!(p,:op,"%"); r=_unary(p); r==0&&throw(DomainError(r,"modulo by zero")); v=mod(v,r)
         else return v end
@@ -150,8 +157,8 @@ end
 function _sum(p)
     v=_product(p)
     while true
-        if accept!(p,:op,"+"); v=v+_product(p)
-        elseif accept!(p,:op,"-"); v=v-_product(p)
+        if accept!(p,:op,"+"); v=_exact_add(v,_product(p))
+        elseif accept!(p,:op,"-"); v=_exact_sub(v,_product(p))
         else return v end
     end
 end

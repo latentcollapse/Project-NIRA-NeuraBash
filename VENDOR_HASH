@@ -1,0 +1,13 @@
+# VENDOR_HASH - Upstream Bash Identity
+# NeuraBash v0.0.7 pins the exact upstream release below.
+
+BASH_VERSION=5.2.37
+BASH_URL=https://ftp.gnu.org/gnu/bash/bash-5.2.37.tar.gz
+BASH_SHA256=9599b22ecd1d5787ad7d3b7bf0c59f312b3396d1e281175dd1f8a4014da621ff
+
+# NeuraBash patch version
+NEURABASH_PATCH_VERSION=0.0.7
+
+# The SHA-256 above is the published Bash 5.2.37 tarball digest.
+# Build tooling MUST abort on a mismatch; it must never continue with an
+# unverified upstream source tree.

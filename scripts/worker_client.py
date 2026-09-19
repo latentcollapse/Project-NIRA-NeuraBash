@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
-import argparse,fcntl,os,socket,struct,subprocess,sys,time
+import argparse,fcntl,os,signal,socket,struct,subprocess,sys,time
 from pathlib import Path
+# Match ordinary Unix producer semantics: downstream pipe closure terminates
+# the process-visible JUL worker with SIGPIPE instead of translating EPIPE into
+# a NeuraBash/daemon error.
+signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 ROOT=Path(__file__).resolve().parent.parent
 RUNTIME=Path(os.environ.get("XDG_RUNTIME_DIR",f"/tmp/neurabash-{os.getuid()}"))/"neurabash"
 SOCK=RUNTIME/"daemon.sock"; LOCK=RUNTIME/"daemon.lock"; LOG=RUNTIME/"daemon.log"

@@ -11,7 +11,7 @@
  #if defined (ARRAY_VARS)
  static char *parse_compound_assignment PARAMS((int *));
  #endif
-@@ -313,5 +317,13 @@ static int token_to_read;
+@@ -313,5 +317,9 @@ static int token_to_read;
  static WORD_DESC *word_desc_to_read;
  
 +/* NeuraBash native JUL trapdoor. */
@@ -21,7 +21,7 @@
  static REDIRECTEE source;
  static REDIRECTEE redir;
  
-@@ -2578,6 +2589,216 @@ special_case_tokens (tokstr)
+@@ -2578,6 +2589,187 @@ special_case_tokens (tokstr)
    return (-1);
  }
  
@@ -209,7 +209,7 @@
  /* Called from shell.c when Control-C is typed at top level.  Or
     by the error rule at top level. */
  void
-@@ -2697,6 +2914,14 @@ read_token (command)
+@@ -2697,6 +2914,13 @@ read_token (command)
        return (result);
      }
  
@@ -223,7 +223,7 @@
  #if defined (COND_COMMAND)
    if ((parser_state & (PST_CONDCMD|PST_CONDEXPR)) == PST_CONDCMD)
      {
-@@ -2792,5 +3016,30 @@ read_token (command)
+@@ -2792,5 +3016,27 @@ read_token (command)
        else if MBTEST(character == '|' && peek_char == '&')
  	return (BAR_AND);
 +      else if MBTEST(character == '|' && peek_char == '!')

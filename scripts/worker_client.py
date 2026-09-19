@@ -5,8 +5,8 @@ from pathlib import Path
 # the process-visible JUL worker with SIGPIPE instead of translating EPIPE into
 # a NeuraBash/daemon error.
 signal.signal(signal.SIGPIPE, signal.SIG_DFL)
-ROOT=Path(__file__).resolve().parent.parent
-RUNTIME=Path(os.environ.get("XDG_RUNTIME_DIR",f"/tmp/neurabash-{os.getuid()}"))/"neurabash"
+ROOT=Path(os.environ.get("NEURABASH_ROOT", str(Path(__file__).resolve().parent.parent))).resolve()
+RUNTIME=Path(os.environ.get("XDG_RUNTIME_DIR",f"/tmp/neurabash-{os.getuid()}"))/"neurabash"/"v0.0.7"
 SOCK=RUNTIME/"daemon.sock"; LOCK=RUNTIME/"daemon.lock"; LOG=RUNTIME/"daemon.log"
 def connect():
  s=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM); s.connect(str(SOCK)); return s

@@ -17,4 +17,6 @@ check_eq pipefail 1 "$NB" --noprofile --norc -c 'set +e; set -o pipefail; false 
 set +e; out="$($NB --noprofile --norc -c '|!> math.eval "1 == 2" |!> shell.require')"; rc=$?; set -e
 [[ $rc -eq 1 && "$out" == false ]]&&{ echo PASS shell_require_false; ((pass+=1)); }||{ echo FAIL shell_require_false >&2; ((fail+=1)); }
 check_eq opaque_source '$HOME *.jl' "$NB" --noprofile --norc -c "printf '%s' '\$HOME *.jl' |!> text.decode"
+check_eq persistent_binding 2 "$NB" --noprofile --norc -c "printf '1,2\\n3,4\\n' |!> matrix.read |!> core.bind A >/dev/null; |!> @A |!> matrix.rank"
+check_eq persistent_tool 3.0 "$NB" --noprofile --norc -c "printf '2,0\\n0,3\\n' |!> matrix.read |!> core.bind A >/dev/null; |!> tool.define spectral_radius @{ matrix.eig --values-only |!> vector.abs |!> vector.max } >/dev/null; |!> @A |!> spectral_radius"
 printf '\nNative JUL MVP: %d passed, %d failed\n' "$pass" "$fail"; ((fail==0))

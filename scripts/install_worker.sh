@@ -7,6 +7,6 @@ cat > "$ROOT_DIR/build/bin/neurabash-jul-worker" <<'WRAP'
 set -euo pipefail
 SELF_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SELF_DIR/../.." && pwd)"
-exec julia --project="$ROOT_DIR/julia" "$ROOT_DIR/julia/bin/worker.jl" "$@"
+exec python3 "$ROOT_DIR/scripts/worker_client.py" "$@"
 WRAP
 chmod +x "$ROOT_DIR/build/bin/neurabash-jul-worker"

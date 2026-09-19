@@ -6,7 +6,10 @@ actual="$($BASH_BIN --version | head -n1)"
 [[ "$actual" == *"version ${PINNED_VERSION}"* ]] || { echo "ERROR: need GNU Bash $PINNED_VERSION" >&2; exit 2; }
 pass=0; fail=0; tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 run_reject_case(){
- local name="$1" source="$2" stdout="$tmp/$name.out" stderr="$tmp/$name.err" marker="$tmp/$name.marker" rc
+ local name="$1" source="$2" rc
+ local stdout="$tmp/$name.out"
+ local stderr="$tmp/$name.err"
+ local marker="$tmp/$name.marker"
  set +e; NB_MARKER="$marker" "$BASH_BIN" --noprofile --norc -c "$source" >"$stdout" 2>"$stderr"; rc=$?; set -e
  local ok=1
  ((rc!=0))||ok=0; [[ ! -s "$stdout" ]]||ok=0

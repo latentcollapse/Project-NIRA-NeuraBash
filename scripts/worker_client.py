@@ -18,11 +18,14 @@ def ensure_daemon():
   except FileNotFoundError: pass
   log=open(LOG,"ab",buffering=0)
   subprocess.Popen(["julia",f"--project={ROOT/'julia'}",str(ROOT/"julia/bin/daemon.jl"),"--socket",str(SOCK)],stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True,close_fds=True)
-  deadline=time.time()+15
+  deadline=time.time()+8
   while time.time()<deadline:
    try: s=connect(); s.close(); return
    except OSError: time.sleep(.05)
-  raise RuntimeError(f"daemon did not start; see {LOG}")
+  detail=""
+  try: detail=LOG.read_text(errors="replace")[-4000:]
+  except Exception: pass
+  raise RuntimeError(f"daemon did not start; see {LOG}\n{detail}")
 def recv_exact(s,n):
  out=bytearray()
  while len(out)<n:

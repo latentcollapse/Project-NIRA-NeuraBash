@@ -9,7 +9,7 @@ read_exact(io,n)=begin b=read(io,n); length(b)==n||throw(EOFError()); b end
 read_u32(io)=foldl((a,x)->(a<<8)|UInt32(x),read_exact(io,4);init=UInt32(0))
 read_u64(io)=foldl((a,x)->(a<<8)|UInt64(x),read_exact(io,8);init=UInt64(0))
 function response(io,status,out,err)
- write(io,codeunits("NBR1")); write(io,u32be(UInt32(status))); write(io,u64be(UInt64(length(out)))); write(io,u64be(UInt64(length(err))); write(io,out); write(io,err); flush(io)
+ write(io,codeunits("NBR1")); write(io,u32be(UInt32(status))); write(io,u64be(UInt64(length(out)))); write(io,u64be(UInt64(length(err)))); write(io,out); write(io,err); flush(io)
 end
 function handle(sock)
  try

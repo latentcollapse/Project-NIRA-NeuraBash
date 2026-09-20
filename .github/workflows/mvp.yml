@@ -1,0 +1,54 @@
+name: NeuraBash MVP
+
+on:
+  push:
+    branches: [ main, 'chatgpt/**' ]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: neurabash-mvp-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-conformance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential bison flex libreadline-dev libncurses-dev curl patch
+
+      - name: Install Julia 1.10
+        uses: julia-actions/setup-julia@v2
+        with:
+          version: '1.10'
+
+      - name: Mark scripts executable
+        run: |
+          chmod +x scripts/*.sh
+          chmod +x tests/token-collision/*.sh tests/static/*.sh tests/mixed-pipeline/*.sh tests/bash-diff/*.sh
+          chmod +x julia/bin/*.jl
+
+      - name: Build NeuraBash
+        run: ./scripts/build.sh
+
+      - name: Run conformance gates
+        env:
+          UPSTREAM_BASH_BIN: ${{ github.workspace }}/build/upstream/bin/bash
+        run: ./scripts/test.sh
+
+      - name: Install smoke test
+        run: |
+          ./scripts/install.sh --prefix "$RUNNER_TEMP/neurabash-install"
+          "$RUNNER_TEMP/neurabash-install/bin/neurabash" --noprofile --norc -c '|!> math.eval "6*7"'
+
+      - name: Print runtime versions
+        if: always()
+        run: |
+          ./build/bin/neurabash --version || true
+          ./build/upstream/bin/bash --version || true
+          julia --version || true
